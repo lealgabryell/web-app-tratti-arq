@@ -102,6 +102,12 @@ export default function AdminDashboard() {
 
       toast.success("Status da etapa atualizado!");
 
+      setCurrentSteps((prev) =>
+        prev.map((etapa) =>
+          etapa.id === stepId ? { ...etapa, status: newStatus } : etapa,
+        ),
+      );
+
       // 2. Atualização Otimista: Atualiza o estado 'contracts' localmente
       setContracts((prevContracts) =>
         prevContracts.map((contract) => {
@@ -146,6 +152,8 @@ export default function AdminDashboard() {
 
       // Atualiza os estados locais para refletir a nova etapa sem refresh
       const updatedEtapas = [...(currentSteps || []), newStep];
+
+      setCurrentSteps(updatedEtapas);
 
       const updatedContract = { ...selectedContract, etapas: updatedEtapas };
 
@@ -292,7 +300,7 @@ export default function AdminDashboard() {
   };
 
   if (loading)
-    return <div className="p-10 text-center">Carregando projetos...</div>;
+    return <div className="text-black p-10 text-center">Carregando contratos...</div>;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-8">
