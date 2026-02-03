@@ -25,13 +25,6 @@ export interface ContractResponse {
   etapas?: ContractStep[];
 }
 
-
-export interface StepItemProps {
-  etapa: ContractStep;
-  isAdmin?: boolean; // Define se exibe o select ou apenas o texto do status
-  onStatusChange?: (newStatus: EtapaStatus) => void;
-}
-
 export interface CreateContractStepRequest {
   title: string;
   startDate: string; // ISO date YYYY-MM-DD
@@ -50,6 +43,15 @@ export interface Address {
   zipCode: string;
 }
 
+export interface UpdateContractRequest {
+  title: string;
+  description: string;
+  totalValue: number;
+  status: ContractStatus;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+}
+
 export interface CreateContractRequest {
   title: string;
   description: string;
@@ -62,4 +64,11 @@ export interface CreateContractRequest {
 export interface NewContractModalProps {
   onClose: () => void;
   onSave: (contract: ContractResponse) => void; // Ou o tipo específico do seu contrato
+}
+
+export interface UpdateContractStepRequest {
+  titulo: string;
+  responsavel: string;
+  dataInicio: string;        // YYYY-MM-DD
+  previsaoConclusao: string; // YYYY-MM-DD
 }

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ContractResponse, ContractStep, CreateContractRequest, CreateContractStepRequest } from "../types/contracts";
+import { ContractResponse, ContractStep, CreateContractRequest, CreateContractStepRequest, UpdateContractRequest, UpdateContractStepRequest } from "../types/contracts";
 import Cookie from "js-cookie";
 
 export const getContracts = async (): Promise<ContractResponse[]> => {
@@ -46,5 +46,38 @@ export const getContractSteps = async (contractId: string): Promise<ContractStep
 
 export const createContract = async (contractData: CreateContractRequest) => {
   const { data } = await api.post('/api/contracts', contractData);
+  return data;
+};
+
+export const updateStepData = async (
+  contractId: string, 
+  stepId: string, 
+  step: ContractStep // Recebemos o objeto do front
+): Promise<ContractStep> => {
+  
+  // Mapeamos para o formato que o Spring Boot espera (DTO)
+  const payload: UpdateContractStepRequest = {
+    titulo: step.title,
+    responsavel: step.responsible,
+    dataInicio: step.startDate,
+    previsaoConclusao: step.expectedEndDate
+  };
+
+  const { data } = await api.put<ContractStep>(
+    `/api/contracts/${contractId}/steps/${stepId}`,
+    payload
+  );
+  
+  return data;
+};
+
+export const updateContract = async (
+  contractId: string, 
+  contractData: UpdateContractRequest
+): Promise<ContractResponse> => {
+  const { data } = await api.put<ContractResponse>(
+    `/api/contracts/${contractId}`, 
+    contractData
+  );
   return data;
 };

@@ -6,6 +6,8 @@ import {
   createStep,
   getContracts,
   getContractSteps,
+  updateContract,
+  updateStepData,
   updateStepStatus,
 } from "../../../services/contracts";
 import {
@@ -13,12 +15,15 @@ import {
   ContractStep,
   CreateContractStepRequest,
   EtapaStatus,
+  UpdateContractRequest,
 } from "../../../types/contracts";
 import toast from "react-hot-toast";
 import ContractCard from "@/src/components/contracts/ContractCard";
 import StepItem from "@/src/components/contracts/StepItem";
 import NewStepForm from "@/src/components/contracts/NewStepForm";
 import NewContractModal from "@/src/components/contracts/NewContractModal";
+import EditStepModal from "@/src/components/contracts/EditStepModal";
+import EditContractModal from "@/src/components/contracts/EditContractModal";
 
 export default function AdminDashboard() {
   const [contracts, setContracts] = useState<ContractResponse[]>([]);
@@ -36,6 +41,8 @@ export default function AdminDashboard() {
   const [contractSearch, setContractSearch] = useState("");
   const [contractStatusFilter, setContractStatusFilter] = useState("ALL");
   const [isNewContractModalOpen, setIsNewContractModalOpen] = useState(false);
+  const [editingStep, setEditingStep] = useState<ContractStep | null>(null);
+  const [isEditContractModalOpen, setIsEditContractModalOpen] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -164,6 +171,71 @@ export default function AdminDashboard() {
       toast.success("Lista de contratos atualizada!");
     } catch (e: unknown) {
       toast.error("Erro ao atualizar lista: " + e);
+    }
+  };
+
+  const handleSaveEditedStep = async (updatedStep: ContractStep) => {
+    if (!selectedContract) return;
+
+    try {
+      // 1. Chama API
+      const result = await updateStepData(
+        selectedContract.id,
+        updatedStep.id,
+        updatedStep,
+      );
+
+      console.log("Resultado da atualização da etapa:", result);
+      toast.success("Etapa atualizada com sucesso!");
+
+      const newStepsList = currentSteps.map((s) =>
+        s.id === updatedStep.id ? updatedStep : s,
+      );
+      setCurrentSteps(newStepsList);
+
+      // 3. Atualiza o objeto de Contrato Global
+      const updatedContract = { ...selectedContract, etapas: newStepsList };
+      setSelectedContract(updatedContract);
+
+      setContracts((prev) =>
+        prev.map((c) => (c.id === selectedContract.id ? updatedContract : c)),
+      );
+    } catch (error: unknown) {
+      toast.error("Erro ao atualizar etapa: " + error);
+      throw error; // Relança para o modal saber que deu erro e não fechar se quiser tratar
+    }
+  };
+
+  const handleEditContract = async (data: UpdateContractRequest) => {
+    if (!selectedContract) return;
+
+    try {
+      // 1. Chama a API
+      const updatedData = await updateContract(selectedContract.id, data);
+
+      toast.success("Contrato atualizado com sucesso!");
+
+      // 2. Atualiza o Contrato Selecionado (mantendo as etapas que já existiam na tela)
+      // O endpoint de update retorna o contrato, mas sem as etapas (Lazy), então preservamos as locais
+      const newSelectedContract = {
+        ...selectedContract,
+        ...updatedData,
+        etapas: selectedContract.etapas, // Mantém as etapas atuais visíveis
+      };
+
+      setSelectedContract(newSelectedContract);
+
+      // 3. Atualiza a Lista Geral de Contratos
+      setContracts((prev) =>
+        prev.map((c) =>
+          c.id === selectedContract.id ? { ...c, ...updatedData } : c,
+        ),
+      );
+
+      setIsEditContractModalOpen(false);
+    } catch (error: unknown) {
+      toast.error("Erro ao atualizar contrato: " + error);
+      throw error;
     }
   };
 
@@ -324,6 +396,27 @@ export default function AdminDashboard() {
                   <h2 className="text-2xl text-blue-600 font-bold mb-4">
                     {selectedContract.title}
                   </h2>
+                  <button
+                    onClick={() => setIsEditContractModalOpen(true)}
+                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Editar informações do contrato"
+                  >
+                    {/* Ícone Lápis Maior */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                      />
+                    </svg>
+                  </button>
                   <p className="text-slate-600 mb-6">
                     {selectedContract.description}
                   </p>
@@ -441,6 +534,7 @@ export default function AdminDashboard() {
                               newStatus,
                             )
                           }
+                          onEdit={(step) => setEditingStep(step)}
                         />
                       ))
                     ) : (
@@ -482,9 +576,27 @@ export default function AdminDashboard() {
       </div>
       {/* Modal de Novo Contrato */}
       {isNewContractModalOpen && (
-        <NewContractModal 
-          onClose={() => setIsNewContractModalOpen(false)} 
+        <NewContractModal
+          onClose={() => setIsNewContractModalOpen(false)}
           onSave={handleContractCreated}
+        />
+      )}
+      {/* Modal de Edição de Etapa */}
+      {editingStep && (
+        <EditStepModal
+          isOpen={!!editingStep}
+          step={editingStep}
+          onClose={() => setEditingStep(null)}
+          onSave={handleSaveEditedStep}
+        />
+      )}
+      {/* Modal de Edição de Contrato */}
+      {isEditContractModalOpen && selectedContract && (
+        <EditContractModal
+          isOpen={isEditContractModalOpen}
+          contract={selectedContract}
+          onClose={() => setIsEditContractModalOpen(false)}
+          onSave={handleEditContract}
         />
       )}
     </div> // Fim da div principal
