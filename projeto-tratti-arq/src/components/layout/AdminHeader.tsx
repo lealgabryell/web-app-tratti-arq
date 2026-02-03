@@ -9,8 +9,8 @@ export default function AdminHeader() {
   const pathname = usePathname();
 
   const handleLogout = () => {
-    Cookie.remove('tratti_token');
-    Cookie.remove('tratti_role');
+    Cookie.remove('user_token');
+    Cookie.remove('user_role');
     window.location.href = '/login';
   };
 

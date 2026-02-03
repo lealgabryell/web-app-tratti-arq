@@ -3,8 +3,8 @@ import type { NextRequest } from "next/server";
 
 // Usamos o 'export default' para garantir que o Next.js encontre a função
 export default function middleware(request: NextRequest) {
-  const token = request.cookies.get("tratti_token")?.value;
-  const role = request.cookies.get("tratti_role")?.value;
+  const token = request.cookies.get("user_token")?.value;
+  const role = request.cookies.get("user_role")?.value;
 
   const { pathname } = request.nextUrl;
 

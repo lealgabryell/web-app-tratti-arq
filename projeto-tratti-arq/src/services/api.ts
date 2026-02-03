@@ -7,7 +7,7 @@ export const api = axios.create({
 
 // Interceptor para adicionar o Token em todas as chamadas
 api.interceptors.request.use((config) => {
-  const token = Cookie.get('tratti_token');
+  const token = Cookie.get('user_token');
   
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

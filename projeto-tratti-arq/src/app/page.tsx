@@ -5,8 +5,8 @@ export default async function RootPage() {
   // Adicionamos o await aqui para resolver a Promise dos cookies
   const cookieStore = await cookies();
   
-  const token = cookieStore.get('tratti_token')?.value;
-  const role = cookieStore.get('tratti_role')?.value;
+  const token = cookieStore.get('user_token')?.value;
+  const role = cookieStore.get('user_role')?.value;
 
   // Se não houver token, manda para o login
   if (!token) {

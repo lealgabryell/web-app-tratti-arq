@@ -3,7 +3,7 @@ import { ContractResponse, ContractStep, CreateContractRequest, CreateContractSt
 import Cookie from "js-cookie";
 
 export const getContracts = async (): Promise<ContractResponse[]> => {
-  const token = Cookie.get("tratti_token");
+  const token = Cookie.get("user_token");
 
   const { data } = await api.get<ContractResponse[]>("/api/contracts", {
     headers: {

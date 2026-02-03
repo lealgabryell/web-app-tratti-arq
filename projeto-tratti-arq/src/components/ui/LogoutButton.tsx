@@ -6,8 +6,8 @@ export default function LogoutButton() {
 
   const handleLogout = () => {
     // 1. Remove os cookies de autenticação
-    Cookie.remove('tratti_token');
-    Cookie.remove('tratti_role');
+    Cookie.remove('user_token');
+    Cookie.remove('user_role');
 
     // 2. Força o redirecionamento e limpa o estado do Next.js
     // Usar window.location.href é útil para garantir que o Middleware 

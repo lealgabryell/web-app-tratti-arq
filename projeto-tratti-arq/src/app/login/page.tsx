@@ -32,8 +32,8 @@ export default function LoginPage() {
       toast.success("Bem-vindo!");
 
       // 3. Salva Token e Redireciona
-      Cookie.set("tratti_token", data.token, { expires: 2 });
-      Cookie.set("tratti_role", data.role, { expires: 2 });
+      Cookie.set("user_token", data.token, { expires: 2 });
+      Cookie.set("user_role", data.role, { expires: 2 });
 
       // Delay pequeno para o usuário ler o toast de sucesso
       setTimeout(() => {
@@ -68,7 +68,7 @@ export default function LoginPage() {
         className="p-10 bg-white shadow-2xl rounded-xl w-full max-w-md border border-gray-200"
       >
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Tratti Arq</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Login</h1>
           <p className="text-gray-500 mt-2">Entre com suas credenciais</p>
         </div>
 
