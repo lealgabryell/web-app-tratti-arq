@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏗️ Platform Arq - Frontend
 
-## Getting Started
+Este é o repositório do frontend da **Platform Arq**, uma solução SaaS *multi-tenancy* moderna, desenvolvida com [Next.js](https://nextjs.org).
 
-First, run the development server:
+---
+
+## 🚀 Getting Started
+
+Primeiro, instale as dependências:
+
+```bash
+npm install
+# ou
+yarn install
+```
+
+Em seguida, configure suas variáveis de ambiente (veja a seção abaixo) e inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌍 Matriz de Ambientes e APIs
 
-## Learn More
+Para garantir a escalabilidade e o suporte a múltiplos clientes (*multi-tenancy*), utilizamos endpoints distintos para cada estágio do ciclo de vida:
 
-To learn more about Next.js, take a look at the following resources:
+| Ambiente       | Ramo (Branch) | Endpoint da API                                   | Objetivo |
+|---------------|---------------|--------------------------------------------------|----------|
+| Local         | feature/*     | http://localhost:8080                            | Desenvolvimento ativo e testes unitários |
+| Dev (Cloud)   | develop       | https://dev-api-platform-arq.onrender.com        | Integração contínua (CI) e testes de ambiente |
+| HML           | main          | https://hml-api-tratti-arq.onrender.com          | Homologação, validação de UI/UX e aceite final |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ⚙️ Configuração de Variáveis de Ambiente
 
-## Deploy on Vercel
+O projeto utiliza variáveis de ambiente para definir o backend de consumo.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Crie um arquivo `.env.local` na raiz do projeto para desenvolvimento local:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
+
+**Atenção:**  
+Em produção e homologação, essas variáveis são injetadas diretamente pelo provedor de host (Vercel / Render).
+
+---
+
+## 🚦 Fluxo de Contribuição (CI/CD)
+
+Adotamos uma estratégia **Backend-First** para garantir a disponibilidade dos serviços e a vitalidade da plataforma:
+
+- **Desenvolvimento Isolado**  
+  Não deve haver desenvolvimento direto voltado para os ambientes `develop` ou `UAT` (HML).  
+  Alterações são feitas apenas via **Pull Request (PR)**.
+
+- **Sincronia de Deploy**  
+  Caso uma nova funcionalidade dependa de alterações no banco de dados ou novos endpoints:
+  - O PR do **Backend** deve ser aprovado e deployado primeiro.
+  - O PR do **Frontend** só deve ser aberto após a confirmação de que os testes da API estão passando no ambiente alvo.
+
+- **Segurança**  
+  A comunicação com a API utiliza tokens **JWT**, armazenados via `js-cookie` sob o nome:
+
+  ```text
+  user_token
+  ```
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Next.js 14+** (App Router)
+- **Axios** (Integração com API)
+- **Tailwind CSS** (Estilização)
+- **Lucide React** (Ícones)
+- **Zustand / React Query** (Gerenciamento de Estado — se aplicável)
+
+---
+
+## 📖 Saiba Mais
+
+Para entender melhor a arquitetura da **Platform Arq**, consulte a documentação do Swagger no backend de desenvolvimento:
+
+👉 https://dev-api-platform-arq.onrender.com/swagger-ui.html
