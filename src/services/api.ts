@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookie from 'js-cookie';
 
 export const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'https://hml-api-tratti-arq.onrender.com',
 });
 
 // Interceptor para adicionar o Token em todas as chamadas
