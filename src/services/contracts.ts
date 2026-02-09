@@ -1,5 +1,13 @@
 import { api } from "./api";
-import { ContractResponse, ContractStep, CreateContractRequest, CreateContractStepRequest, UpdateContractRequest, UpdateContractStepRequest } from "../types/contracts";
+import {
+  ContractHistoryResponse,
+  ContractResponse,
+  ContractStep,
+  CreateContractRequest,
+  CreateContractStepRequest,
+  UpdateContractRequest,
+  UpdateContractStepRequest,
+} from "../types/contracts";
 import Cookie from "js-cookie";
 
 export const getContracts = async (): Promise<ContractResponse[]> => {
@@ -31,7 +39,10 @@ export const updateStepStatus = async (
 };
 
 // Criar nova etapa
-export const createStep = async (contractId: string, stepData: CreateContractStepRequest) => {
+export const createStep = async (
+  contractId: string,
+  stepData: CreateContractStepRequest,
+) => {
   const { data } = await api.post(
     `/api/contracts/${contractId}/steps`,
     stepData,
@@ -39,45 +50,71 @@ export const createStep = async (contractId: string, stepData: CreateContractSte
   return data;
 };
 
-export const getContractSteps = async (contractId: string): Promise<ContractStep[]> => {
-  const { data } = await api.get<ContractStep[]>(`/api/contracts/${contractId}/steps`);
+export const getContractSteps = async (
+  contractId: string,
+): Promise<ContractStep[]> => {
+  const { data } = await api.get<ContractStep[]>(
+    `/api/contracts/${contractId}/steps`,
+  );
   return data;
 };
 
 export const createContract = async (contractData: CreateContractRequest) => {
-  const { data } = await api.post('/api/contracts', contractData);
+  const { data } = await api.post("/api/contracts", contractData);
   return data;
 };
 
 export const updateStepData = async (
-  contractId: string, 
-  stepId: string, 
-  step: ContractStep // Recebemos o objeto do front
+  contractId: string,
+  stepId: string,
+  step: ContractStep, // Recebemos o objeto do front
 ): Promise<ContractStep> => {
-  
   // Mapeamos para o formato que o Spring Boot espera (DTO)
   const payload: UpdateContractStepRequest = {
     titulo: step.title,
     responsavel: step.responsible,
     dataInicio: step.startDate,
-    previsaoConclusao: step.expectedEndDate
+    previsaoConclusao: step.expectedEndDate,
   };
 
   const { data } = await api.put<ContractStep>(
     `/api/contracts/${contractId}/steps/${stepId}`,
-    payload
+    payload,
   );
-  
+
   return data;
 };
 
 export const updateContract = async (
-  contractId: string, 
-  contractData: UpdateContractRequest
+  contractId: string,
+  contractData: UpdateContractRequest,
 ): Promise<ContractResponse> => {
   const { data } = await api.put<ContractResponse>(
-    `/api/contracts/${contractId}`, 
-    contractData
+    `/api/contracts/${contractId}`,
+    contractData,
   );
   return data;
+};
+
+export const uploadContractPDF = async (
+  contractId: string,
+  file: File,
+  type: "SCANNED" | "FINAL",
+) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("type", type);
+
+  const response = await api.post(
+    `/api/contracts/${contractId}/upload-pdf`,
+    formData,
+  );
+  return response.data; // Retorna { url: "..." }
+};
+
+
+export const getContractHistory = async (contractId: string): Promise<ContractHistoryResponse[]> => {
+  // Note o path atualizado conforme seu Controller
+  const response = await api.get<ContractHistoryResponse[]>(`/api/contracts/${contractId}/history`);
+  return response.data;
 };
