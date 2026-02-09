@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   cancelContract,
   createStep,
+  getContractHistory,
   getContracts,
   getContractSteps,
   updateContract,
@@ -11,6 +12,7 @@ import {
   updateStepStatus,
 } from "../../../services/contracts";
 import {
+  ContractHistoryResponse,
   ContractResponse,
   ContractStep,
   CreateContractStepRequest,
@@ -24,6 +26,8 @@ import NewStepForm from "@/src/components/contracts/NewStepForm";
 import NewContractModal from "@/src/components/contracts/NewContractModal";
 import EditStepModal from "@/src/components/contracts/EditStepModal";
 import EditContractModal from "@/src/components/contracts/EditContractModal";
+import { ContractFileUpload } from "@/src/components/contracts/FileUpload";
+import { ContractFilesView } from "@/src/components/contracts/FileView";
 
 export default function AdminDashboard() {
   const [contracts, setContracts] = useState<ContractResponse[]>([]);
@@ -43,6 +47,8 @@ export default function AdminDashboard() {
   const [isNewContractModalOpen, setIsNewContractModalOpen] = useState(false);
   const [editingStep, setEditingStep] = useState<ContractStep | null>(null);
   const [isEditContractModalOpen, setIsEditContractModalOpen] = useState(false);
+  const [, setHistory] = useState<ContractHistoryResponse[]>([]);
+  const [, setLoadingHistory] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -57,6 +63,14 @@ export default function AdminDashboard() {
     }
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (selectedContract) {
+      loadHistory(selectedContract.id);
+    } else {
+      setHistory([]); // Limpa ao fechar
+    }
+  }, [selectedContract]);
 
   const filteredSteps = currentSteps.filter((etapa) => {
     const matchesSearch = etapa.title
@@ -272,6 +286,18 @@ export default function AdminDashboard() {
     }
   };
 
+  const loadHistory = async (contractId: string) => {
+    setLoadingHistory(true);
+    try {
+      const data = await getContractHistory(contractId);
+      setHistory(data);
+    } catch (error) {
+      console.error("Erro ao carregar histórico:", error);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
   const statusConfig = {
     // Status do Contrato
     DRAFT: { label: "Rascunho", color: "bg-gray-100 text-gray-600" },
@@ -300,7 +326,9 @@ export default function AdminDashboard() {
   };
 
   if (loading)
-    return <div className="text-black p-10 text-center">Carregando contratos...</div>;
+    return (
+      <div className="text-black p-10 text-center">Carregando contratos...</div>
+    );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-8">
@@ -400,7 +428,7 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative">
               {!showSteps ? (
                 /* CONTEÚDO: DETALHES DO CONTRATO */
-                <div>
+                <div className="flex flex-col gap-1.5">
                   <h2 className="text-2xl text-blue-600 font-bold mb-4">
                     {selectedContract.title}
                   </h2>
@@ -444,6 +472,13 @@ export default function AdminDashboard() {
                         {selectedContract.clientEmail}
                       </p>
                     </div>
+                  </div>
+                  <ContractFilesView
+                    scannedUrl={selectedContract.scannedContractUrl}
+                    finalUrl={selectedContract.finalProjectUrl}
+                  />
+                  <div className="border-t pt-6">
+                    <ContractFileUpload contractId={selectedContract.id} />
                   </div>
 
                   <div className="flex gap-4">

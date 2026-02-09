@@ -1,6 +1,15 @@
-export type ContractStatus = 'DRAFT' | 'ACTIVE' | 'SUSPENDED' | 'FINISHED' | 'CANCELED';
+export type ContractStatus =
+  | "DRAFT"
+  | "ACTIVE"
+  | "SUSPENDED"
+  | "FINISHED"
+  | "CANCELED";
 
-export type EtapaStatus = 'PROGRAMADA' | 'EM_ANDAMENTO' | 'CONCLUIDA' | 'CANCELADA';
+export type EtapaStatus =
+  | "PROGRAMADA"
+  | "EM_ANDAMENTO"
+  | "CONCLUIDA"
+  | "CANCELADA";
 
 export interface ContractStep {
   id: string;
@@ -23,6 +32,8 @@ export interface ContractResponse {
   clientName: string;
   clientEmail: string;
   etapas?: ContractStep[];
+  scannedContractUrl?: string;
+  finalProjectUrl?: string;
 }
 
 export interface CreateContractStepRequest {
@@ -49,7 +60,7 @@ export interface UpdateContractRequest {
   totalValue: number;
   status: ContractStatus;
   startDate: string; // YYYY-MM-DD
-  endDate: string;   // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
 }
 
 export interface CreateContractRequest {
@@ -58,7 +69,7 @@ export interface CreateContractRequest {
   totalValue: number;
   startDate: string;
   endDate: string;
-  clientId?: string; 
+  clientId?: string;
 }
 
 export interface NewContractModalProps {
@@ -69,6 +80,16 @@ export interface NewContractModalProps {
 export interface UpdateContractStepRequest {
   titulo: string;
   responsavel: string;
-  dataInicio: string;        // YYYY-MM-DD
+  dataInicio: string; // YYYY-MM-DD
   previsaoConclusao: string; // YYYY-MM-DD
+}
+
+export interface ContractHistoryResponse {
+  id: string;
+  title: string;
+  description: string;
+  totalValue: number;
+  status: string;
+  modifiedAt: string; // ISO String vinda do LocalDateTime
+  modifiedBy: string;
 }
