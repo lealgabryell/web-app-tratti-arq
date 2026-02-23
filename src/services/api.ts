@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookie from 'js-cookie';
 
 export const api = axios.create({
-  baseURL: 'https://dev-api-platform-arq.onrender.com',
+  baseURL: 'http://localhost:8080',
 });
 
 // Interceptor para adicionar o Token em todas as chamadas
