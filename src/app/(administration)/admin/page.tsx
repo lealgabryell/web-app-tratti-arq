@@ -264,6 +264,16 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleContractUpdate = (updatedContract: ContractResponse) => {
+    setSelectedContract(updatedContract);
+
+    setContracts((prevContracts) =>
+      prevContracts.map((c) =>
+        c.id === updatedContract.id ? updatedContract : c,
+      ),
+    );
+  };
+
   const filteredContracts = contracts.filter((contract) => {
     const searchTerm = contractSearch.toLowerCase();
     const matchesSearch =
@@ -342,7 +352,7 @@ export default function AdminDashboard() {
           </h1>
           <p className="text-sm text-slate-500 text-shadow-black">
             Gestão de projetos e clientes
-          </p>
+          </p> 
         </div>
         <button
           onClick={() => setIsNewContractModalOpen(true)}
@@ -489,7 +499,10 @@ export default function AdminDashboard() {
                     finalUrl={selectedContract.finalProjectUrl}
                   />
                   <div className="border-t pt-6">
-                    <ContractFileUpload contractId={selectedContract.id} />
+                    <ContractFileUpload
+                      contractId={selectedContract.id}
+                      onUploadSuccess={handleContractUpdate}
+                    />
                   </div>
 
                   <div className="flex gap-4">

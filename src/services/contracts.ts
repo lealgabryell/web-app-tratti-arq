@@ -100,7 +100,7 @@ export const uploadContractPDF = async (
   contractId: string,
   file: File,
   type: "SCANNED" | "FINAL",
-) => {
+): Promise<ContractResponse> => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("type", type);
@@ -109,12 +109,11 @@ export const uploadContractPDF = async (
     `/api/contracts/${contractId}/upload-pdf`,
     formData,
   );
-  return response.data; // Retorna { url: "..." }
+  return response.data; 
 };
 
 
 export const getContractHistory = async (contractId: string): Promise<ContractHistoryResponse[]> => {
-  // Note o path atualizado conforme seu Controller
   const response = await api.get<ContractHistoryResponse[]>(`/api/contracts/${contractId}/history`);
   return response.data;
 };

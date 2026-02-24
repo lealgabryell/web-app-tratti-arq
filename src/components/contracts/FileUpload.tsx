@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { FileUp, FileCheck, Loader2 } from 'lucide-react';
 import { uploadContractPDF } from '../../services/contracts';
 import { toast } from 'react-hot-toast'; // Opcional, para feedback
+import { ContractResponse } from '@/src/types/contracts';
 
 interface UploadSectionProps {
   contractId: string;
+  onUploadSuccess: (response: ContractResponse) => void; 
 }
 
-export const ContractFileUpload: React.FC<UploadSectionProps> = ({ contractId }) => {
+export const ContractFileUpload: React.FC<UploadSectionProps> = ({ contractId, onUploadSuccess }) => {
   const [loading, setLoading] = useState<'SCANNED' | 'FINAL' | null>(null);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'SCANNED' | 'FINAL') => {
@@ -21,9 +23,11 @@ export const ContractFileUpload: React.FC<UploadSectionProps> = ({ contractId })
 
     try {
       setLoading(type);
-      await uploadContractPDF(contractId, file, type);
+      const response = await uploadContractPDF(contractId, file, type);
       toast.success(`${type === 'SCANNED' ? 'Contrato' : 'Projeto Final'} enviado com sucesso!`);
-      // Aqui você pode atualizar o estado da página para exibir o link do PDF
+      if (onUploadSuccess) {
+      onUploadSuccess(response); 
+    }
     } catch (error) {
       toast.error('Erro ao fazer upload do arquivo: ' + error);
     } finally {
